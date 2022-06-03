@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+REPO="$(git rev-parse --show-toplevel)"
+BRANCH=main
+URL_BASE=https://github.com/optdyn
+MOD_SHORT=test
+MOD_NAME=proenv-${MOD_SHORT}-module
+MOD_BASE=${URL_BASE}/${MOD_NAME}
+REPO_ZIP=${MOD_BASE}/archive/refs/heads/${BRANCH}.zip
+ZIP_FILE=${MOD_NAME}.zip
+
+# download and extract
+mkdir -p "${REPO}/.proenv/modules"
+cd "${REPO}/.proenv/modules"
+curl -fsSL $REPO_ZIP -o $ZIP_FILE
+VERSION_HASH="$(unzip "${ZIP_FILE}" | grep --only-matching -E '^[a-f0-9]*')"
+rm -f ${ZIP_FILE}
+rm -rf ${MOD_NAME}
+mv ${MOD_NAME}-${BRANCH} ./${MOD_NAME}
+echo ${BRANCH} > ${MOD_NAME}/BRANCH
+echo ${VERSION_HASH} > ${MOD_NAME}/HEAD
+
+# links and perms
+cd ..
+chmod +x modules/${MOD_NAME}/bin/*
+mkdir -p bin
+cd bin
+for binfile in ../modules/${MOD_NAME}/bin/*; do
+  if [[ ! -f ./"$(basename "${binfile}")" ]]; then 
+    ln -s ${binfile} $(basename ${binfile})
+  else
+    ln -s ${binfile} ${MOD_SHORT}-$(basename ${binfile})
+  fi
+done
+
+cd ../etc
+for etcfile in ../modules/${MOD_NAME}/etc/*; do
+  if [[ ! -f ./"$(basename "${etcfile}")" ]]; then
+    ln -s ${etcfile} $(basename ${etcfile})
+  else
+    ln -s ${etcfile} ${MOD_SHORT}-$(basename ${etcfile})
+  fi
+done
+

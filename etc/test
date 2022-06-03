@@ -1,6 +1,6 @@
 test1_EVAR='test1 environment variable'
-export TEST1_EVAR
+export test1_EVAR
 
 test2_EVAR='test2 environment variable'
-export TEST2_EVAR
+export test2_EVAR
 
