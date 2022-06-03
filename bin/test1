@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo $(basename $0) from proenv-test-module
+echo $(basename $0)_EVAR = $TEST1_EVAR
+
